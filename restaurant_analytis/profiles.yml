@@ -1,7 +1,7 @@
 restaurant_analytis:
   outputs:
     dev:
-      host: localhost
+      host: spark-thrift-server
       method: thrift
       port: 10000
       schema: dev

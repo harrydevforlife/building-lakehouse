@@ -1,11 +1,21 @@
 import os
 from datetime import timedelta
+import json
 
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.bash import BashOperator
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from datetime import datetime
+
+HOME = os.environ["HOME"] # retrieve the location of your home folder
+dbt_path = os.path.join(HOME, "restaurant_analytis") # path to your dbt project
+manifest_path = os.path.join(dbt_path, "target/manifest.json") # path to manifest.json
+
+with open(manifest_path) as f: # Open manifest.json
+  manifest = json.load(f) # Load its contents into a Python Dictionary
+  nodes = manifest["nodes"] # Extract just the nodes
 
 
 # Default settings applied to all tasks
@@ -30,9 +40,8 @@ def set_enviroment():
 
 
 with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as dag:
-    start = DummyOperator(task_id="start")
     set_env = PythonOperator(task_id="set_enviroment", python_callable=set_enviroment)
-    end = DummyOperator(task_id="end")
+    start_transform = DummyOperator(task_id="start_transform")
     create_schema = SparkSubmitOperator(
         task_id='create_schema',
         total_executor_cores='1',
@@ -40,7 +49,7 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
         executor_memory='1g',
         num_executors='1',
         driver_memory='1g',
-        application="../scripts/create_schema.py",
+        application="../airflow/scripts/create_schema.py",
         packages="org.apache.hadoop:hadoop-aws:3.3.4",
         jars="../airflow/jars/hadoop-aws-3.3.4.jar,../airflow/jars/s3-2.18.41.jar,../airflow/jars/aws-java-sdk-1.12.367.jar,../airflow/jars/delta-core_2.12-2.2.0.jar,../airflow/jars/delta-storage-2.2.0.jar,../airflow/jars/mysql-connector-java-8.0.19.jar",
         conn_id="spark_master" , # Connection ID for your Spark cluster configuration
@@ -56,7 +65,7 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
         executor_memory='1g',
         num_executors='1',
         driver_memory='1g',
-        application="../scripts/bronze_tip.py",
+        application="../airflow/scripts/bronze_tip.py",
         packages="org.apache.hadoop:hadoop-aws:3.3.4",
         jars="../airflow/jars/hadoop-aws-3.3.4.jar,../airflow/jars/s3-2.18.41.jar,../airflow/jars/aws-java-sdk-1.12.367.jar,../airflow/jars/delta-core_2.12-2.2.0.jar,../airflow/jars/delta-storage-2.2.0.jar,../airflow/jars/mysql-connector-java-8.0.19.jar",
         conn_id="spark_master" , # Connection ID for your Spark cluster configuration
@@ -72,7 +81,7 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
         executor_memory='1g',
         num_executors='1',
         driver_memory='1g',
-        application="../scripts/bronze_user.py",
+        application="../airflow/scripts/bronze_user.py",
         packages="org.apache.hadoop:hadoop-aws:3.3.4",
         jars="../airflow/jars/hadoop-aws-3.3.4.jar,../airflow/jars/s3-2.18.41.jar,../airflow/jars/aws-java-sdk-1.12.367.jar,../airflow/jars/delta-core_2.12-2.2.0.jar,../airflow/jars/delta-storage-2.2.0.jar,../airflow/jars/mysql-connector-java-8.0.19.jar",
         conn_id="spark_master" , # Connection ID for your Spark cluster configuration
@@ -88,7 +97,7 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
         executor_memory='1g',
         num_executors='1',
         driver_memory='1g',
-        application="../scripts/bronze_restaurant.py",
+        application="../airflow/scripts/bronze_restaurant.py",
         packages="org.apache.hadoop:hadoop-aws:3.3.4",
         jars="../airflow/jars/hadoop-aws-3.3.4.jar,../airflow/jars/s3-2.18.41.jar,../airflow/jars/aws-java-sdk-1.12.367.jar,../airflow/jars/delta-core_2.12-2.2.0.jar,../airflow/jars/delta-storage-2.2.0.jar,../airflow/jars/mysql-connector-java-8.0.19.jar",
         conn_id="spark_master" , # Connection ID for your Spark cluster configuration
@@ -104,7 +113,7 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
         executor_memory='1g',
         num_executors='1',
         driver_memory='1g',
-        application="../scripts/bronze_review.py",
+        application="../airflow/scripts/bronze_review.py",
         packages="org.apache.hadoop:hadoop-aws:3.3.4",
         jars="../airflow/jars/hadoop-aws-3.3.4.jar,../airflow/jars/s3-2.18.41.jar,../airflow/jars/aws-java-sdk-1.12.367.jar,../airflow/jars/delta-core_2.12-2.2.0.jar,../airflow/jars/delta-storage-2.2.0.jar,../airflow/jars/mysql-connector-java-8.0.19.jar",
         conn_id="spark_master" , # Connection ID for your Spark cluster configuration
@@ -120,7 +129,7 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
         executor_memory='2g',
         num_executors='1',
         driver_memory='1g',
-        application="../scripts/bronze_checkin.py",
+        application="../airflow/scripts/bronze_checkin.py",
         packages="org.apache.hadoop:hadoop-aws:3.3.4",
         jars="../airflow/jars/hadoop-aws-3.3.4.jar,../airflow/jars/s3-2.18.41.jar,../airflow/jars/aws-java-sdk-1.12.367.jar,../airflow/jars/delta-core_2.12-2.2.0.jar,../airflow/jars/delta-storage-2.2.0.jar,../airflow/jars/mysql-connector-java-8.0.19.jar",
         conn_id="spark_master" , # Connection ID for your Spark cluster configuration
@@ -129,5 +138,33 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
             "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog"
         }
     )
-start >> set_env >> create_schema >> ingest_tip >> ingest_user >> ingest_restaurant >> ingest_review >> ingest_checkin >> end
-# start >> set_env >> ingest_checkin >> end
+
+        # Create a dict of Operators
+    dbt_tasks = dict()
+    for node_id, node_info in nodes.items():
+        if node_info["resource_type"] == "model":
+            dbt_tasks[node_id] = BashOperator(
+                task_id=".".join(
+                    [
+                        node_info["package_name"],
+                        node_info["name"],
+                    ]
+                ),
+                bash_command=f"cd {dbt_path}" # Go to the path containing your dbt project
+                + f" && dbt run --models {node_info['name']}", # run the model!
+            )
+
+    # Define relationships between Operators
+    for node_id, node_info in nodes.items():
+        if node_info["resource_type"] == "model":
+            upstream_nodes = node_info["depends_on"]["nodes"]
+            if upstream_nodes:
+                    for upstream_node in upstream_nodes:
+                        if upstream_node in dbt_tasks:
+                            dbt_tasks[upstream_node] >> dbt_tasks[node_id]
+
+# set_env >> create_schema >> ingest_tip >> ingest_user >> ingest_restaurant >> ingest_review >> ingest_checkin
+# # start >> set_env >> ingest_checkin >> end
+set_env >> create_schema
+create_schema >> [ingest_tip, ingest_user, ingest_restaurant, ingest_review, ingest_checkin] >> start_transform
+start_transform >> list(dbt_tasks.values())
