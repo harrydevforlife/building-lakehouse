@@ -1,0 +1,92 @@
+version: 2
+
+sources:
+  - name: silver
+    tables:
+      - name: olist_products
+        external:
+          location: 's3a://warehouse/bronze/olist_products'
+          using: delta
+        columns:
+          - name: product_id
+            data_type: string
+          - name: product_category_name
+            data_type: string
+          - name: product_name_lenght
+            data_type: int
+          - name: product_description_lenght
+            data_type: int
+          - name: product_photos_qty
+            data_type: int
+          - name: product_weight_g
+            data_type: int
+          - name: product_length_cm
+            data_type: int
+          - name: product_height_cm
+            data_type: int
+          - name: product_width_cm
+            data_type: int
+      - name: product_category_name_translation
+        external:
+          location: 's3a://warehouse/bronze/product_category_name_translation'
+          using: delta
+        columns:
+          - name: product_category_name
+            data_type: string
+          - name: product_category_name_english
+            data_type: string
+      - name: olist_order_items
+        external:
+          location: 's3a://warehouse/bronze/olist_order_items'
+          using: delta
+        columns:
+          - name: order_id
+            data_type: string
+          - name: order_item_id
+            data_type: int
+          - name: product_id
+            data_type: string
+          - name: seller_id
+            data_type: string
+          - name: shipping_limit_date
+            data_type: string
+          - name: price
+            data_type: float
+          - name: freight_value
+            data_type: float
+      - name: olist_order_payments
+        external:
+          location: 's3a://warehouse/bronze/olist_order_payments'
+          using: delta
+        columns:
+          - name: order_id
+            data_type: string
+          - name: payment_sequential
+            data_type: int
+          - name: payment_type
+            data_type: string
+          - name: payment_installments
+            data_type: int
+          - name: payment_value
+            data_type: float
+      - name: olist_orders
+        external:
+          location: 's3a://warehouse/bronze/olist_orders'
+          using: delta
+        columns:
+          - name: order_id
+            data_type: string
+          - name: customer_id
+            data_type: string
+          - name: order_status
+            data_type: string
+          - name: order_purchase_timestamp
+            data_type: string
+          - name: order_approved_at
+            data_type: string
+          - name: order_delivered_carrier_date
+            data_type: string
+          - name: order_delivered_customer_date
+            data_type: string
+          - name: order_estimated_delivery_date
+            data_type: string

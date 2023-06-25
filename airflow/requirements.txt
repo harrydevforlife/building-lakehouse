@@ -1,0 +1,5 @@
+pandas    
+dbt-core
+dbt-spark
+findspark
+delta-spark==2.2.0

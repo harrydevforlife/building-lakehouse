@@ -1,0 +1,10 @@
+restaurant_analytis:
+  outputs:
+    dev:
+      host: localhost
+      method: thrift
+      port: 10000
+      schema: dev
+      threads: 1
+      type: spark
+  target: dev
