@@ -11,7 +11,7 @@ AWS_BUCKET_NAME = 'lakehouse'
 
 
 spark = SparkSession.builder \
-    .appName('Ingest review table into bronze') \
+    .appName('Create schema bronze') \
     .master('spark://spark-master:7077') \
     .config("hive.metastore.uris", "thrift://hive-metastore:9083")\
     .config("spark.hadoop.fs.s3a.access.key", AWS_ACCESS_KEY) \
@@ -32,6 +32,5 @@ spark = SparkSession.builder \
 
 spark.sparkContext.setLogLevel("ERROR")
 
-df = spark.read.json("s3a://raw-data/yelp/json/yelp_academic_dataset_review.json")
-df.write.format("delta").mode("overwrite").saveAsTable("bronze.review")
-spark.sql("SHOW TABLES IN bronze").show()
+spark.sql(f"CREATE SCHEMA IF NOT EXISTS bronze")
+spark.sql("SHOW DATABASES").show()

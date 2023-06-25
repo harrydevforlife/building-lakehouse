@@ -12,6 +12,7 @@ AWS_BUCKET_NAME = 'lakehouse'
 
 spark = SparkSession.builder \
     .appName('Ingest tip table into bronze') \
+    .master('spark://spark-master:7077') \
     .config("hive.metastore.uris", "thrift://hive-metastore:9083")\
     .config("spark.hadoop.fs.s3a.access.key", AWS_ACCESS_KEY) \
     .config("spark.hadoop.fs.s3a.secret.key", AWS_ACCESS_KEY) \
@@ -31,7 +32,6 @@ spark = SparkSession.builder \
 
 spark.sparkContext.setLogLevel("ERROR")
 
-spark.sql(f"CREATE SCHEMA IF NOT EXISTS bronze")
-df = spark.read.json("s3a://raw-data/yelp/restaurant/yelp_academic_dataset_tip.json")
+df = spark.read.json("s3a://raw-data/yelp/json/yelp_academic_dataset_tip.json")
 df.write.format("delta").mode("overwrite").saveAsTable("bronze.tip")
-spark.sql("SHOW DATABASES").show()
+spark.sql("SHOW TABLES IN bronze").show()

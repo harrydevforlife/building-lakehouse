@@ -56,7 +56,7 @@ case "$1" in
     airflow db init 
     airflow connections add 'spark_master' \
           --conn-type 'spark' \
-          --conn-host 'spark://spark3-master:7077'
+          --conn-host 'spark://spark-master:7077'
 
     if [ "$AIRFLOW__CORE__EXECUTOR" = "LocalExecutor" ] || [ "$AIRFLOW__CORE__EXECUTOR" = "SequentialExecutor" ]; then
       # With the "Local" and "Sequential" executors, the scheduler should run in the same container.

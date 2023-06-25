@@ -34,9 +34,6 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   restaurant_analytis:
     # Config indicated by + and applies to all files under models/example/
-    example:
-      +schema: example
-      +materialized: view
     +file_format: delta
     +pre_hook:
       - SET spark.hadoop.fs.s3a.endpoint=http://minio:9000
@@ -45,7 +42,9 @@ models:
       - SET spark.hadoop.fs.s3a.path.style.access=true
       - SET spark.hadoop.fs.s3a.connection.ssl.enabled=false
       - SET spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem
-    # silver:
-    #   +location_root: s3a://warehouse/silver
-    # gold:
-    #   +location_root: s3a://warehouse/gold
+    silver:
+      +schema: silver
+      +materialized: view
+    gold:
+      +schema: gold
+      +materialized: view

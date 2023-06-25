@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: dim_user
+    description: "Dim user table in silver schema"
+    columns:
+      - name: user_id
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null

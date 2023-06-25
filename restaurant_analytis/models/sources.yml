@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: bronze
+    tables:
+      - name: restaurant
+      - name: user
+      - name: review
+      - name: checkin
+      - name: tip
+  - name: dev_silver
+    schema: dev_silver
+    tables:
+      - name: fact_review
+      - name: dim_user
+      - name: dim_restaurant
