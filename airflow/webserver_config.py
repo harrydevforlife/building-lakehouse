@@ -31,7 +31,7 @@ from airflow.www.fab_security.manager import AUTH_DB
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # Flask-WTF flag for CSRF
-WTF_CSRF_ENABLED = False
+WTF_CSRF_ENABLED = True
 WTF_CSRF_TIME_LIMIT = None
 WTF_CSRF_CHECK_DEFAULT = False
 # ----------------------------------------------------
@@ -70,7 +70,7 @@ AUTH_USER_REGISTRATION = True
 # MAIL_DEFAULT_SENDER = 'sender@gmail.com'
 
 # The default user self registration role
-AUTH_USER_REGISTRATION_ROLE = "Public"
+AUTH_USER_REGISTRATION_ROLE = "Admin"
 
 # When using OAuth Auth, uncomment to setup provider(s) info
 # Google OAuth example:
