@@ -11,7 +11,7 @@ AWS_BUCKET_NAME = 'lakehouse'
 
 
 spark = SparkSession.builder \
-    .appName('Create schema bronze') \
+    .appName('Ingest checkin table into bronze') \
     .master('spark://spark-master:7077') \
     .config("hive.metastore.uris", "thrift://hive-metastore:9083")\
     .config("spark.hadoop.fs.s3a.access.key", AWS_ACCESS_KEY) \
@@ -32,6 +32,8 @@ spark = SparkSession.builder \
 
 spark.sparkContext.setLogLevel("ERROR")
 
-spark.sql(f"CREATE SCHEMA IF NOT EXISTS bronze")
-spark.sql(f"CREATE SCHEMA IF NOT EXISTS feature_store")
-spark.sql("SHOW DATABASES").show()
+spark.sql("CREATE DATABASE IF NOT EXISTS feature_store")
+df = spark.read.table("bronze.review")
+df = df.select("business_id", "user_id", "stars")
+df.write.format("delta").mode("overwrite").saveAsTable("feature_store.review")
+spark.sql("SHOW TABLES IN feature_store").show()

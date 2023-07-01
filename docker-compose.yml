@@ -59,17 +59,6 @@ services:
       - de_mysql
       - minio
 
-  trino:
-    container_name: trino
-    image: "trinodb/trino"
-    hostname: trino
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./trino:/etc/trino
-    networks:
-      - data_network
-
   spark-master:
     build:
       context: ./spark
@@ -148,7 +137,10 @@ services:
       - mysql-airflow
     environment:
       - LOAD_EX=n
+      - AIRFLOW__CORE__FERNET_KEY=airflow_fernet_key
       - AIRFLOW__WEBSERVER__SECRET_KEY=airflow_secret_key
+      - AIRFLOW__WEBSERVER__SECRET_KEY_CMD=airflow_secret_key
+      - AIRFLOW__WEBSERVER__SECRET_KEY_SECRET=airflow_secret_key
       - AIRFLOW_CORE_MYSQL_CONN=mysql+mysqlconnector://airflow:airflow@mysql-airflow:3306/airflow
       - EXECUTOR=Local    
     logging:
@@ -191,6 +183,24 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     volumes:
       - ./mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - data_network
+
+  mlflow:
+    build:
+      context: ./mlflow
+      dockerfile: Dockerfile
+    container_name: mlflow
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - FILE_DIR=/mlflow
+      - AWS_BUCKET=mlflow
+      - AWS_ACCESS_KEY_ID=minio
+      - AWS_SECRET_ACCESS_KEY=minio123
+      - PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
     networks:
       - data_network
 
