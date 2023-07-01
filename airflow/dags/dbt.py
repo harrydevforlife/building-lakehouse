@@ -17,4 +17,5 @@ with DAG(dag_id="etl", start_date=datetime(2020, 1, 1), schedule_interval="@dail
         env={"SPARK_HOME": "/usr/local/airflow/jars"}
     )
 
+    run_dbt 
 
