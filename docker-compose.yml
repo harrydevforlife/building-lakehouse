@@ -141,6 +141,7 @@ services:
       - AIRFLOW__WEBSERVER__SECRET_KEY=airflow_secret_key
       - AIRFLOW__WEBSERVER__SECRET_KEY_CMD=airflow_secret_key
       - AIRFLOW__WEBSERVER__SECRET_KEY_SECRET=airflow_secret_key
+      - AIRFLOW__WEBSERVER__RBAC=False
       - AIRFLOW_CORE_MYSQL_CONN=mysql+mysqlconnector://airflow:airflow@mysql-airflow:3306/airflow
       - EXECUTOR=Local    
     logging:
@@ -149,6 +150,7 @@ services:
             max-file: "3"
     volumes:
         - ./restaurant_analytis:/usr/local/airflow/restaurant_analytis
+        - ./airflow/webserver_config.py:/usr/local/airflow/webserver_config.py
         - ./airflow/dags:/usr/local/airflow/dags
         - ./airflow/logs:/usr/local/airflow/logs
         - ./airflow/plugins:/usr/local/airflow/plugins
