@@ -33,7 +33,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 # Flask-WTF flag for CSRF
 WTF_CSRF_ENABLED = False
 WTF_CSRF_TIME_LIMIT = None
-
+WTF_CSRF_CHECK_DEFAULT = False
 # ----------------------------------------------------
 # AUTHENTICATION CONFIG
 # ----------------------------------------------------
@@ -50,13 +50,13 @@ WTF_CSRF_TIME_LIMIT = None
 AUTH_TYPE = AUTH_DB
 
 # Uncomment to setup Full admin role name
-# AUTH_ROLE_ADMIN = 'Admin'
+AUTH_ROLE_ADMIN = 'Admin'
 
 # Uncomment and set to desired role to enable access without authentication
-# AUTH_ROLE_PUBLIC = 'Viewer'
+AUTH_ROLE_PUBLIC = 'Viewer'
 
 # Will allow user self registration
-# AUTH_USER_REGISTRATION = True
+AUTH_USER_REGISTRATION = True
 
 # The recaptcha it's automatically enabled for user self registration is active and the keys are necessary
 # RECAPTCHA_PRIVATE_KEY = PRIVATE_KEY
@@ -70,7 +70,7 @@ AUTH_TYPE = AUTH_DB
 # MAIL_DEFAULT_SENDER = 'sender@gmail.com'
 
 # The default user self registration role
-# AUTH_USER_REGISTRATION_ROLE = "Public"
+AUTH_USER_REGISTRATION_ROLE = "Public"
 
 # When using OAuth Auth, uncomment to setup provider(s) info
 # Google OAuth example:
