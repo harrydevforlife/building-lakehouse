@@ -163,8 +163,8 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
                         if upstream_node in dbt_tasks:
                             dbt_tasks[upstream_node] >> dbt_tasks[node_id]
 
-# set_env >> create_schema >> ingest_tip >> ingest_user >> ingest_restaurant >> ingest_review >> ingest_checkin
+set_env >> create_schema >> ingest_tip >> ingest_user >> ingest_restaurant >> ingest_review >> ingest_checkin >> start_transform >> list(dbt_tasks.values())
 # # start >> set_env >> ingest_checkin >> end
-set_env >> create_schema
-create_schema >> [ingest_tip, ingest_user, ingest_restaurant, ingest_review, ingest_checkin] >> start_transform
-start_transform >> list(dbt_tasks.values())
+# set_env >> create_schema
+# create_schema >> [ingest_tip, ingest_user, ingest_restaurant, ingest_review, ingest_checkin] >> start_transform
+# start_transform >> list(dbt_tasks.values())
