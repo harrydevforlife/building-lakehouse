@@ -12,11 +12,10 @@ def set_env():
     os.environ["DBT_PROJECT_DIR"] = "$AIRFLOW_HOME/restaurant_analytis"
 
 with DAG(dag_id="run_dbt", start_date=datetime(2020, 1, 1), schedule_interval="@daily", catchup=False) as dag:
-    set_environment = PythonOperator(task_id="hello_world", python_callable=set_env)
+    set_environment = PythonOperator(task_id="set_env_var", python_callable=set_env)
     run_dbt = BashOperator( 
         task_id="run_dbt",
-        bash_command="dbt run --profiles-dir $DBT_PROFILES_DIR --project-dir $DBT_PROJECT_DIR",
-        env={"SPARK_HOME": "/usr/local/airflow/jars"}
+        bash_command="dbt run"
     )
 
     set_environment >> run_dbt 
