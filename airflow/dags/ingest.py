@@ -76,9 +76,9 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
     )
     ingest_user = SparkSubmitOperator(
         task_id='ingest_user',
-        total_executor_cores='1',
-        executor_cores='1',
-        executor_memory='1g',
+        total_executor_cores='2',
+        executor_cores='2',
+        executor_memory='2g',
         num_executors='1',
         driver_memory='1g',
         application="../airflow/scripts/bronze_user.py",
@@ -92,9 +92,9 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
     )
     ingest_restaurant = SparkSubmitOperator(
         task_id='ingest_restaurant',
-        total_executor_cores='1',
-        executor_cores='1',
-        executor_memory='1g',
+        total_executor_cores='2',
+        executor_cores='2',
+        executor_memory='2g',
         num_executors='1',
         driver_memory='1g',
         application="../airflow/scripts/bronze_restaurant.py",
@@ -126,7 +126,7 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
         task_id='ingest_checkin',
         total_executor_cores='1',
         executor_cores='1',
-        executor_memory='2g',
+        executor_memory='1g',
         num_executors='1',
         driver_memory='1g',
         application="../airflow/scripts/bronze_checkin.py",
