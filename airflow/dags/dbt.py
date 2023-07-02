@@ -15,7 +15,7 @@ with DAG(dag_id="run_dbt", start_date=datetime(2020, 1, 1), schedule_interval="@
     set_environment = PythonOperator(task_id="set_env_var", python_callable=set_env)
     run_dbt = BashOperator( 
         task_id="run_dbt",
-        bash_command="dbt run"
+        bash_command="cd $AIRFLOW_HOME/restaurant_analytis && dbt run",
     )
 
     set_environment >> run_dbt 
