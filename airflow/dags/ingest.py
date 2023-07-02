@@ -108,9 +108,9 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
     )
     ingest_review = SparkSubmitOperator(
         task_id='ingest_review',
-        total_executor_cores='1',
-        executor_cores='1',
-        executor_memory='1g',
+        total_executor_cores='2',
+        executor_cores='2',
+        executor_memory='2g',
         num_executors='1',
         driver_memory='1g',
         application="../airflow/scripts/bronze_review.py",
