@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from airflow import DAG
 from airflow.operators.bash import BashOperator
+from airflow.operators.python_operator import PythonOperator
 
 HOME = os.environ["HOME"] # retrieve the location of your home folder
 dbt_path = os.path.join(HOME, "restaurant_analytis") # path to your dbt project
@@ -12,12 +13,21 @@ with open(manifest_path) as f: # Open manifest.json
   manifest = json.load(f) # Load its contents into a Python Dictionary
   nodes = manifest["nodes"] # Extract just the nodes
 
+def set_env():
+    print("Setting dbt environment variables")
+    os.environ["DBT_PROFILES_DIR"] = "$AIRFLOW_HOME/restaurant_analytis"
+    os.environ["DBT_PROJECT_DIR"] = "$AIRFLOW_HOME/restaurant_analytis"
+
+
 # Build an Airflow DAG
 with DAG(
   dag_id="dbt_transform", # The name that shows up in the UI
   start_date=datetime(2023, 1, 1),
   catchup=False,
 ) as dag:
+
+  # Set environment variables
+  set_environment = PythonOperator(task_id="set_environment", python_callable=set_env)
 
   # Create a dict of Operators
   dbt_tasks = dict()
@@ -43,5 +53,4 @@ with DAG(
                     if upstream_node in dbt_tasks:
                         dbt_tasks[upstream_node] >> dbt_tasks[node_id]
 
-# if __name__ == "__main__":
-#   dag.cli()
+  set_environment >> list(dbt_tasks.values()) # Set environment variables before running dbt
