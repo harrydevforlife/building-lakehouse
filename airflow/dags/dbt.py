@@ -10,7 +10,7 @@ def hello_world():
     print("Hello World")
     print(os.environ.get("SPARK_HOME"))
 
-with DAG(dag_id="etl", start_date=datetime(2020, 1, 1), schedule_interval="@daily", catchup=False) as dag:
+with DAG(dag_id="run_dbt", start_date=datetime(2020, 1, 1), schedule_interval="@daily", catchup=False) as dag:
     run_dbt = BashOperator( 
         task_id="run_dbt",
         bash_command="dbt run",

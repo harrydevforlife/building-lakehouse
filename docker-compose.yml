@@ -143,7 +143,7 @@ services:
       - AIRFLOW__WEBSERVER__SECRET_KEY_SECRET=airflow_secret_key
       - AIRFLOW__WEBSERVER__RBAC=False
       - AIRFLOW__WEBSERVER__SESSION_BACKEND=securecookie
-      - AIRFLOW_CORE_MYSQL_CONN=mysql+mysqlconnector://airflow:airflow@mysql-airflow:3306/airflow
+      - AIRFLOW_CORE_MYSQL_CONN=mysql+mysqlconnector://airflow:airflow@mysql-airflow:3307/airflow
       - EXECUTOR=Local    
     logging:
         options:
@@ -151,7 +151,7 @@ services:
             max-file: "3"
     volumes:
         - ./restaurant_analytis:/usr/local/airflow/restaurant_analytis
-        - ./airflow/webserver_config.py:/usr/local/airflow/webserver_config.py
+        # - ./airflow/webserver_config.py:/usr/local/airflow/webserver_config.py
         - ./airflow/dags:/usr/local/airflow/dags
         - ./airflow/logs:/usr/local/airflow/logs
         - ./airflow/plugins:/usr/local/airflow/plugins
