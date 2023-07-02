@@ -11,7 +11,7 @@ AWS_BUCKET_NAME = 'lakehouse'
 
 
 spark = SparkSession.builder \
-    .appName('Ingest review table into bronze') \
+    .appName('Ingest restaurant table into bronze') \
     .master('spark://spark-master:7077') \
     .config("hive.metastore.uris", "thrift://hive-metastore:9083")\
     .config("spark.hadoop.fs.s3a.access.key", AWS_ACCESS_KEY) \
