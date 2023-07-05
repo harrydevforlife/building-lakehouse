@@ -3,3 +3,4 @@ dbt-core
 dbt-spark
 findspark
 delta-spark==2.2.0
+pydantic==1.10.10
