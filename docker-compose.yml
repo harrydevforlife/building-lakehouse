@@ -145,10 +145,10 @@ services:
       - AIRFLOW__WEBSERVER__SESSION_BACKEND=securecookie
       - AIRFLOW_CORE_MYSQL_CONN=mysql+mysqlconnector://airflow:airflow@mysql-airflow:3307/airflow
       - EXECUTOR=Local    
-    logging:
-        options:
-            max-size: 10m
-            max-file: "3"
+    # logging:
+    #     options:
+    #         max-size: 10m
+    #         max-file: "3"
     volumes:
         - ./restaurant_analytis:/usr/local/airflow/restaurant_analytis
         # - ./airflow/webserver_config.py:/usr/local/airflow/webserver_config.py
