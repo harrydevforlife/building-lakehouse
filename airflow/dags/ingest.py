@@ -26,6 +26,7 @@ default_args = {
     'email_on_retry': False,
     'start_date': datetime(2023, 1, 1),
     'retries': 1,
+    'schedule_interval': '15 08 * * *',
     'retry_delay': timedelta(seconds=5),
     'dagrun_timeout': timedelta(hours=12),
 }
