@@ -1,4 +1,11 @@
-# lakehouse on local machine
+# lakehouse on local 
+
+## System Architecture
+![lakehouse](./.images/Data-System-Architecture.png)
+
+
+## Lakehouse Architecture
+![lakehouse](./.images/Lakehouse-Architecture.png)
 
 ## Prepare infrastructure
 ```bash
