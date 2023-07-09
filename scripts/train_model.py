@@ -63,46 +63,49 @@ def trainModel(data, rank=4, iters=4, reg=0.35, fullData=True, justTrain=True) -
         train: training ALS model
 
     """
-    print("Training recommend model ...")
-
     mlflow.set_tracking_uri("http://mlflow:5000")
+    mlflow.set_experiment("recommend_model")
+    experiment = mlflow.get_experiment_by_name("recommend_model")
 
-    
-    newData = preprocessingData(data)
+    with mlflow.start_run(experiment_id=experiment.experiment_id, run_name='spark_als_model'):
+        print("Starting ...")
 
-    if fullData:
-        testData=newData
-        model = train(newData, rank, iters, reg)
-    
-        mlflow.log_metric("training_nrows", newData.count())
-        mlflow.log_metric("test_nrows", testData.count())
-        print("Training: {}, test: {}".format(newData.count(), testData.count()))
-    else:
-        trainData, testData = splitData(newData)
-        model = train(trainData, rank, iters, reg)
+        newData = preprocessingData(data)
 
-        mlflow.log_metric("training_nrows", newData.count())
-        mlflow.log_metric("test_nrows", testData.count())
-        print("Training: {}, test: {}".format(newData.count(), testData.count()))
-    if justTrain == False:
-        predictionsTestData = predictData(model, testData)
-        predictionsTrainData = predictData(model, trainData)
+        if fullData:
+            testData=newData
+            trainData=newData
+            model = train(trainData, rank, iters, reg)
+        
+            mlflow.log_metric("training_nrows", trainData.count())
+            mlflow.log_metric("test_nrows", testData.count())
+            print("Training: {}, test: {}".format(trainData.count(), testData.count()))
+        else:
+            trainData, testData = splitData(newData)
+            model = train(trainData, rank, iters, reg)
 
-        test_mse =  evaluateResult(predictionsTestData)
-        train_mse = evaluateResult(predictionsTrainData)
+            mlflow.log_metric("training_nrows", trainData.count())
+            mlflow.log_metric("test_nrows", testData.count())
+            print("Training: {}, test: {}".format(trainData.count(), testData.count()))
+        if justTrain == False:
+            predictionsTestData = predictData(model, testData)
+            predictionsTrainData = predictData(model, trainData)
 
-        print("The model had a MSE on the test set of {}".format(test_mse))
-        print("The model had a MSE on the (train) set of {}".format(train_mse))
-        mlflow.log_metric("test_mse", test_mse)
-        mlflow.log_metric("train_mse", train_mse)
+            test_mse =  evaluateResult(predictionsTestData)
+            train_mse = evaluateResult(predictionsTrainData)
 
-        return test_mse, train_mse
-    
-    mlflow.spark.log_model(model, "als-model")
+            print("The model had a MSE on the test set of {}".format(test_mse))
+            print("The model had a MSE on the (train) set of {}".format(train_mse))
+            mlflow.log_metric("test_mse", test_mse)
+            mlflow.log_metric("train_mse", train_mse)
+
+            # return test_mse, train_mse
+        mlflow.spark.log_model(model, "als-model")
     return model
 
 
 def train(trainData, rank, iters, reg) -> ALSModel:
+    print("Training model")
     als= ALS(
         rank=rank, 
         maxIter=iters, 
@@ -122,9 +125,9 @@ def predictData(model, testData) -> ALSModel.transform:
     return predictions
 
 def evaluateResult(predictions) -> RegressionEvaluator.evaluate:
+    print("Evaluating on model...")
     evaluator = RegressionEvaluator(metricName="rmse", labelCol="stars", predictionCol="prediction")
     rmse = evaluator.evaluate(predictions)
-    del evaluator
     return rmse
 
 def saveModel(model, path):
@@ -164,6 +167,7 @@ def preprocessingData(data):
     return newratings
 
 def splitData(data, ratio=0.3):
+    print("Splitting data to training and testing data ...")
     ### First split Data
     # get num row of test Data
     num=int(data.count()*ratio)
@@ -191,10 +195,20 @@ def splitData(data, ratio=0.3):
     # Each test/train data, remove old and add new data
     training=training.subtract(newRowTest).union(newRowTrain)
     testing=testing.subtract(newRowTrain).union(newRowTest)
+    training = (training
+        .withColumn("userid", col("userid").cast("int"))
+        .withColumn("businessid", col("businessid").cast("int"))
+        .withColumn("stars", col("stars").cast("int"))
+    )
+    testing = (testing
+        .withColumn("userid", col("userid").cast("int"))
+        .withColumn("businessid", col("businessid").cast("int"))
+        .withColumn("stars", col("stars").cast("int"))
+    )
     del newRowTest,newRowTrain
     return training,testing
 
 
 if __name__ == "__main__":
     review_dataset = spark.table("feature_store.review")
-    trainModel(review_dataset)
+    trainModel(review_dataset, rank=4, iters=4, reg=0.35, fullData=False, justTrain=False)
