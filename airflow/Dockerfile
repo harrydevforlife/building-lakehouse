@@ -4,8 +4,7 @@
 # BUILD: docker build --rm -t puckel/docker-airflow .
 # SOURCE: https://github.com/puckel/docker-airflow
 
-# FROM python:3.7-slim-buster
-FROM python:3.9
+FROM python:3.9-slim-buster
 LABEL maintainer="Puckel_"
 
 # Never prompt the user for choices on installation/configuration of packages
@@ -62,6 +61,7 @@ RUN set -ex \
     && pip install pyOpenSSL \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
+    && pip install mysqlclient==2.1.1 \
     && pip install apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,spark,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
     && pip install --force-reinstall pyspark==3.3.2 \
     && pip install 'redis==3.2' \
