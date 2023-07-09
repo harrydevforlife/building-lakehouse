@@ -9,14 +9,6 @@ from airflow.operators.bash import BashOperator
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from datetime import datetime
 
-HOME = os.environ["HOME"] # retrieve the location of your home folder
-dbt_path = os.path.join(HOME, "restaurant_analytis") # path to your dbt project
-manifest_path = os.path.join(dbt_path, "target/manifest.json") # path to manifest.json
-
-with open(manifest_path) as f: # Open manifest.json
-  manifest = json.load(f) # Load its contents into a Python Dictionary
-  nodes = manifest["nodes"] # Extract just the nodes
-
 
 # Default settings applied to all tasks
 default_args = {
