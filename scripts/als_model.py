@@ -9,6 +9,7 @@ import click
 
 import mlflow
 import pyspark
+from pyspark.ml.feature import OneHotEncoder, StringIndexer
 from pyspark.ml import Pipeline
 from pyspark.ml.recommendation import ALS
 from pyspark.ml.evaluation import RegressionEvaluator
