@@ -1,0 +1,124 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.childDetail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.left {
+    width: 40%;
+    margin: 1%;
+}
+
+.right {
+    width: 60%;
+}
+
+.streamlit-expanderHeader {
+    font-family: sans-serif;
+    font-weight: bold;
+    color: #e10202;
+    font-size: 24px;
+    background-color: #111111b3;
+    border-radius: 30px;
+    text-align: center;
+    padding: 5px;
+    margin: 10px;
+}
+
+.streamlit-expanderHeader>* {
+    color: white;
+}
+
+.stMarkdown {
+    text-align: left;
+}
+
+.streamlit-expanderContent {
+    color: white;
+    background-color: #111111b8;
+}
+
+.css-1vgnld3.effi0qh0 {
+    color: white;
+}
+
+.row-widget.stButton>* {
+    padding: 10px;
+    padding-left: 30px;
+    padding-right: 30px;
+    border-radius: 12px;
+    border: 14px;
+    margin-top: 30px;
+    background-color: #262731;
+    color: red;
+    font-size: 20px;
+}
+
+.css-f341up.e16nr0p31 {
+    background-color: #0000009e;
+    padding: 19px;
+    margin-left: 30px;
+    border-radius: 10px;
+}
+
+div.e1tzin5v2:not(.css-ulq27u):not(.css-ht50i) {
+    background-color: #030000c4;
+    border-radius: 5px;
+    border: 1px solid #6c0101;
+    text-align: center;
+    font-weight: bold;
+    color: white;
+    font-size: 12px;
+    /*margin: 5px;*/
+    padding: 10px;
+    font-family: serif;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.css-1v0mbdj.etr89bj1 {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    -webkit-transition: .3s ease-in-out;
+    transition: .3s ease-in-out;
+}
+
+.css-1v0mbdj.etr89bj1:hover {
+    -webkit-transform: scale(1.2);
+    transform: scale(1.2);
+    z-index: 1000;
+}
+
+.css-177yq5e {
+    margin-bottom: 0rem;
+}
+
+.css-e370rw.e19lei0e0 {
+    visibility: hidden;
+}
+
+.css-zw9mgv.edgvbvh6 {
+    color: white;
+    border-color: white;
+}
+
+#movie-recommender-system {
+    font-family: monospace;
+    text-align: center;
+    font-weight: bold;
+    color: #e10202;
+    font-size: 30px;
+}
+
+.stApp.streamlit-wide {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://cdn.vox-cdn.com/thumbor/5d_RtADj8ncnVqh-afV3mU-XQv0=/0x0:1600x1067/1200x900/filters:focal(672x406:928x662)/cdn.vox-cdn.com/uploads/chorus_image/image/57698831/51951042270_78ea1e8590_h.7.jpg');
+    background-size: cover;
+}

@@ -85,9 +85,9 @@ if __name__ == "__main__":
             stage="Production"
         )
     if model_version.version != 1:
-        old_model_version = model_version.version - 1
+        old_model_version = int(model_version.version) - 1
         transit_model(
             model_name="restaurant_recommender",
-            model_version=mold_model_version,
+            model_version=old_model_version,
             stage="Archived"
         )

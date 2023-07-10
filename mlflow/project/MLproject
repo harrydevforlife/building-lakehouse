@@ -1,0 +1,14 @@
+name: My Project
+
+python_env: python_env.yaml
+
+entry_points:
+  main:
+    parameters:
+      data_file: path
+      regularization: {type: float, default: 0.1}
+    command: "python train.py -r {regularization} {data_file}"
+  validate:
+    parameters:
+      data_file: path
+    command: "python validate.py {data_file}"

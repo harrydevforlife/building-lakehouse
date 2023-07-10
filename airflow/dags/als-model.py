@@ -76,7 +76,7 @@ with DAG('mlflow_model', default_args=default_args, schedule_interval=None) as d
 
     serving_model = BashOperator(
         task_id="serving_model",
-        bash_command='mlflow models serve -m "models:/restaurant_recommender/Production"'
+        bash_command='sh $AIRFLOW_HOME/scripts/serving_model.sh'
     )
 
     set_env >> feature_store >> train_model >> register_model >> serving_model

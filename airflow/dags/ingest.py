@@ -140,6 +140,22 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
             "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog"
         }
     )
+    transform_user_account = SparkSubmitOperator(
+        task_id='transform_user_account',
+        total_executor_cores='1',
+        executor_cores='1',
+        executor_memory='1g',
+        num_executors='1',
+        driver_memory='1g',
+        application="../airflow/scripts/bronze_user_account.py",
+        packages="org.apache.hadoop:hadoop-aws:3.3.4",
+        jars="../airflow/jars/hadoop-aws-3.3.4.jar,../airflow/jars/s3-2.18.41.jar,../airflow/jars/aws-java-sdk-1.12.367.jar,../airflow/jars/delta-core_2.12-2.2.0.jar,../airflow/jars/delta-storage-2.2.0.jar,../airflow/jars/mysql-connector-java-8.0.19.jar",
+        conn_id="spark_master" , # Connection ID for your Spark cluster configuration
+        conf={
+            "spark.sql.extensions": "io.delta.sql.DeltaSparkSessionExtension",
+            "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+        }
+    )
 
         # Create a dict of Operators
     dbt_tasks = dict()
@@ -165,7 +181,7 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
                         if upstream_node in dbt_tasks:
                             dbt_tasks[upstream_node] >> dbt_tasks[node_id]
 
-set_env >> create_schema >> ingest_review >> ingest_tip >> ingest_user >> ingest_restaurant >> ingest_checkin >> start_transform >> list(dbt_tasks.values())
+set_env >> create_schema >> ingest_review >> ingest_tip >> ingest_user >> ingest_restaurant >> ingest_checkin >> transform_user_account >> start_transform >> list(dbt_tasks.values())
 # # start >> set_env >> ingest_checkin >> end
 # set_env >> create_schema
 # create_schema >> [ingest_tip, ingest_user, ingest_restaurant, ingest_review, ingest_checkin] >> start_transform
