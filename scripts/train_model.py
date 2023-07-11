@@ -32,6 +32,7 @@ def spark_session(spark_session):
         .config("spark.hadoop.fs.s3a.endpoint", AWS_S3_ENDPOINT)\
         .config("spark.hadoop.fs.s3a.path.style.access", "true")\
         .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
+        .config("spark.hadoop.fs.s3.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
         .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false")\
         .config('spark.hadoop.fs.s3a.aws.credentials.provider', 'org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider')\
         .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
@@ -110,8 +111,8 @@ def train(trainData, rank, iters, reg) -> ALSModel:
         rank=rank, 
         maxIter=iters, 
         regParam=reg, 
-        userCol="businessid", 
-        itemCol="userid", 
+        userCol="userid", 
+        itemCol="businessid", 
         ratingCol="stars", 
         nonnegative=True, 
         implicitPrefs = False, 
