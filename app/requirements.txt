@@ -1,14 +1,14 @@
+pyHive
+sasl
+thrift
+thrift-sasl
+# SQLAlchemy
 scipy
-requests==2.24.0
 numpy
+requests==2.24.0
 pandas==1.4.0
 scikit-learn==1.0
 streamlit==1.15.0
-pandas_profiling==3.1.0
-wordcloud
-pyspark==2.4.0
-matplotlib
-pywaffle
-squarify
---use-feature=2020-resolver pandas-profiling
-findspark
+altair==4.0
+pyspark==3.3.2
+findspark==1.4.2

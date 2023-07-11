@@ -1,25 +1,36 @@
+import os
+
 import pandas as pd
 import requests
-import constants as const
 
-import findspark
-findspark.init()
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
+
+import constants as const
+from script.s3_file import download, connect
+
 spark = SparkSession.builder \
     .appName("app") \
     .master("local") \
     .getOrCreate()
 
-imageJson=spark.read.json('../../temp/yelp_image_photos.json')
+pwd_dir = os.getcwd()
+
+s3_connection = connect()
+
+if os.path.exists(pwd_dir+"/tmp/photos.json") == False:
+    download(s3_connection, "raw-data", "yelp/images/photos.json")
+
+imageJson=spark.read.json(pwd_dir+"/tmp/photos.json")
 
 def fetch_poster(res_id):
     try:
-        full_path="D:/temp/photos/"
         photo=imageJson.filter(col('business_id')==res_id).take(1)[0][3]
-        return full_path+photo+".jpg"
+        if os.path.exists(pwd_dir+"/tmp/"+photo+".jpg") == False:
+            download(s3_connection, "raw-data", "yelp/images/photos/"+photo+".jpg")
+        return pwd_dir+"/tmp/"+photo+".jpg"
     except:
-        return "https://thuvienlogo.com/data/03/logo-nha-hang-dep-07.jpg"
+        return "https://toohotel.com/wp-content/uploads/2022/09/TOO_restaurant_Panoramique_vue_Paris_nuit_v2-scaled.jpg"
 
 
 def get_recommendations(res, names, cosine_sim):

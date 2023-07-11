@@ -5,10 +5,22 @@ import sys
 sys.path.append('../')
 import constants as const
 
-def initialize_res_widget(st):
-    """here we create empty blanks for all recommended restaurants
-    and add description and title from appropriate config file"""
+# def initialize_res_widget(st):
+#     """here we create empty blanks for all recommended restaurants
+#     and add description and title from appropriate config file"""
 
+#     res_cols = st.columns(const.RES_NUMBER)
+#     for c in res_cols:
+#         with c:
+#             st.empty()
+#     return res_cols
+
+def initialize_res_widget(cfg,st):
+    """here we create empty blanks for all recommended restaurants
+    # and add description and title from appropriate config file"""
+    st.button(cfg["title"])
+    # with st.expander(cfg["title"],):
+    #     st.markdown(cfg["description"])
     res_cols = st.columns(const.RES_NUMBER)
     for c in res_cols:
         with c:
@@ -30,6 +42,7 @@ def detail_item(business_id,selected_rows,st):
 
 def show_recommended_res_info(recommended_res, res_cols, show_score,st):
     """in this function we get all data what we want to show and put in on webpage"""
+
     res_ids = recommended_res["business_id"]
     res_name = recommended_res["name"]
     res_scores = recommended_res["score"]
@@ -55,3 +68,20 @@ def show_recommended_res_info(recommended_res, res_cols, show_score,st):
             st.image(img)
             if show_score:
                 st.write(round(score, 3))
+
+def show_recom_user(userdf,model,df,explode,col):
+    userSubsetRecs = model.recommendForUserSubset(userdf, 1000)
+    nrecommendations = userSubsetRecs\
+        .withColumn("rec_exp", explode("recommendations"))\
+        .select('userid', col("rec_exp.businessid"), col("rec_exp.rating"))
+    nrecommendations.show()
+    ### check if exist at web model
+    nrecommendations=nrecommendations.filter(col('businessid').isin(list(df["businessid"])))  
+    ### will change to business ad gold layer
+    businessid_list = [row['businessid'] for row in nrecommendations.select('businessid').collect()]
+    nrecommendations = nrecommendations.filter(col('businessid').isin(businessid_list))
+    nrecommendations=nrecommendations.limit(const.RES_NUMBER)
+    lst = nrecommendations.select('businessid').rdd.flatMap(lambda x: x).collect()
+    col1_list = list(lst)
+    lstres = df[df['businessid'].isin(col1_list)]
+    return lstres[["business_id", "name", "score"]]

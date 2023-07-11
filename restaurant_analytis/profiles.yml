@@ -5,6 +5,6 @@ restaurant_analytis:
       method: thrift
       port: 10000
       schema: dev
-      threads: 1
+      threads: 6
       type: spark
   target: dev

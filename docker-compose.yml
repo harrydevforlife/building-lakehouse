@@ -221,6 +221,20 @@ services:
     networks:
       - data_network
 
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: recommender_app
+    ports:
+      - "8051:8051"
+    command: bash -c "export PYTHONPATH=/home/app"
+    volumes:
+      - ./app:/home/app
+    networks:
+      - data_network
+      
+
 networks:
   data_network:
     driver: bridge
