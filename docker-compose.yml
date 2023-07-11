@@ -145,13 +145,9 @@ services:
       - AIRFLOW__WEBSERVER__SESSION_BACKEND=securecookie
       - AIRFLOW_CORE_MYSQL_CONN=mysql+mysqlconnector://airflow:airflow@mysql-airflow:3307/airflow
       - EXECUTOR=Local    
-    # logging:
-    #     options:
-    #         max-size: 10m
-    #         max-file: "3"
     volumes:
         - ./restaurant_analytis:/usr/local/airflow/restaurant_analytis
-        # - ./airflow/webserver_config.py:/usr/local/airflow/webserver_config.py
+        - ./mlflow/project:/usr/local/airflow/mlflow-project
         - ./airflow/dags:/usr/local/airflow/dags
         - ./airflow/logs:/usr/local/airflow/logs
         - ./airflow/plugins:/usr/local/airflow/plugins
@@ -203,6 +199,24 @@ services:
       - AWS_ACCESS_KEY_ID=minio
       - AWS_SECRET_ACCESS_KEY=minio123
       - PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
+    networks:
+      - data_network
+
+  model_serving:
+    build:
+      context: ./model_server
+      dockerfile: Dockerfile
+    container_name: recommender_model
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./model_server/main.py:/opt/mlflow/main.py
+    environment:
+      - AWS_ACCESS_KEY_ID=minio
+      - AWS_SECRET_ACCESS_KEY=minio123
+      - AWS_BUCKET=mlflow
+      - FILE_DIR=/mlflow
       - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
     networks:
       - data_network

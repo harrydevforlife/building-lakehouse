@@ -24,7 +24,7 @@ default_args = {
     'depends_on_past': False,
     'email_on_failure': False,
     'email_on_retry': False,
-    'start_date': datetime(2023, 1, 1),
+    'start_date': datetime(2023, 7, 1),
     'retries': 1,
     'schedule_interval': '15 08 * * *',
     'retry_delay': timedelta(seconds=5),
@@ -41,7 +41,7 @@ def set_enviroment():
     print(os.environ.get("HIVE_HOME"))
 
 
-with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as dag:
+with DAG('etl_pipeline', default_args=default_args,  schedule_interval=None) as dag:
     set_env = PythonOperator(task_id="set_enviroment", python_callable=set_enviroment)
     start_transform = DummyOperator(task_id="start_transform")
     create_schema = SparkSubmitOperator(
@@ -140,6 +140,38 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
             "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog"
         }
     )
+    transform_user_account = SparkSubmitOperator(
+        task_id='transform_user_account',
+        total_executor_cores='1',
+        executor_cores='1',
+        executor_memory='1g',
+        num_executors='1',
+        driver_memory='1g',
+        application="../airflow/scripts/bronze_user_account.py",
+        packages="org.apache.hadoop:hadoop-aws:3.3.4",
+        jars="../airflow/jars/hadoop-aws-3.3.4.jar,../airflow/jars/s3-2.18.41.jar,../airflow/jars/aws-java-sdk-1.12.367.jar,../airflow/jars/delta-core_2.12-2.2.0.jar,../airflow/jars/delta-storage-2.2.0.jar,../airflow/jars/mysql-connector-java-8.0.19.jar",
+        conn_id="spark_master" , # Connection ID for your Spark cluster configuration
+        conf={
+            "spark.sql.extensions": "io.delta.sql.DeltaSparkSessionExtension",
+            "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+        }
+    )
+    transform_restaurant = SparkSubmitOperator(
+        task_id='transform_restaurant',
+        total_executor_cores='2',
+        executor_cores='2',
+        executor_memory='2g',
+        num_executors='1',
+        driver_memory='1g',
+        application="../airflow/scripts/bronze_business_transform.py",
+        packages="org.apache.hadoop:hadoop-aws:3.3.4",
+        jars="../airflow/jars/hadoop-aws-3.3.4.jar,../airflow/jars/s3-2.18.41.jar,../airflow/jars/aws-java-sdk-1.12.367.jar,../airflow/jars/delta-core_2.12-2.2.0.jar,../airflow/jars/delta-storage-2.2.0.jar,../airflow/jars/mysql-connector-java-8.0.19.jar",
+        conn_id="spark_master" , # Connection ID for your Spark cluster configuration
+        conf={
+            "spark.sql.extensions": "io.delta.sql.DeltaSparkSessionExtension",
+            "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+        }
+    )
 
         # Create a dict of Operators
     dbt_tasks = dict()
@@ -165,7 +197,7 @@ with DAG('etl_pipeline', default_args=default_args, schedule_interval=None) as d
                         if upstream_node in dbt_tasks:
                             dbt_tasks[upstream_node] >> dbt_tasks[node_id]
 
-set_env >> create_schema >> ingest_review >> ingest_tip >> ingest_user >> ingest_restaurant >> ingest_checkin >> start_transform >> list(dbt_tasks.values())
+set_env >> create_schema >> ingest_review >> ingest_tip >> ingest_user >> ingest_restaurant >> ingest_checkin >> [transform_user_account, transform_restaurant] >> start_transform >> list(dbt_tasks.values())
 # # start >> set_env >> ingest_checkin >> end
 # set_env >> create_schema
 # create_schema >> [ingest_tip, ingest_user, ingest_restaurant, ingest_review, ingest_checkin] >> start_transform

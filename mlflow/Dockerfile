@@ -1,6 +1,6 @@
 FROM python:3.9
 
-LABEL maintainer "Florian Muchow <flmuchow@gmail.com>"
+LABEL maintainer "admin@lakehouse.io"
 
 RUN pip install mlflow==2.3.2 && \
     pip install awscli --upgrade --user && \

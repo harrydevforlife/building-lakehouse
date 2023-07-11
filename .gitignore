@@ -5,7 +5,7 @@ __pycache__/
 .venv
 .jar
 logs/
-app/
+
 # C extensions
 *.so
 

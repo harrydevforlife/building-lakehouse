@@ -16,7 +16,7 @@ default_args = {
     'depends_on_past': False,
     'email_on_failure': False,
     'email_on_retry': False,
-    'start_date': datetime(2023, 1, 1),
+    'start_date': datetime(2023, 7, 1),
     'retries': 1,
     'retry_delay': timedelta(seconds=5)
 }
@@ -33,7 +33,7 @@ def set_enviroment():
     os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://minio:9000"
 
 
-with DAG('mlflow_model', default_args=default_args, schedule_interval=None) as dag:
+with DAG('mlflow_model', default_args=default_args,  schedule_interval=None) as dag:
     set_env = PythonOperator(task_id="set_enviroment", python_callable=set_enviroment)
     feature_store = SparkSubmitOperator(
         task_id='feature_store',
@@ -54,11 +54,11 @@ with DAG('mlflow_model', default_args=default_args, schedule_interval=None) as d
 
     train_model = SparkSubmitOperator(
         task_id='train_model',
-        total_executor_cores='2',
+        total_executor_cores='4',
         executor_cores='2',
-        executor_memory='2g',
+        executor_memory='4g',
         num_executors='2',
-        driver_memory='1g',
+        driver_memory='2g',
         application="../airflow/scripts/train_model.py",
         packages="org.apache.hadoop:hadoop-aws:3.3.4",
         jars="../airflow/jars/hadoop-aws-3.3.4.jar,../airflow/jars/s3-2.18.41.jar,../airflow/jars/aws-java-sdk-1.12.367.jar,../airflow/jars/delta-core_2.12-2.2.0.jar,../airflow/jars/delta-storage-2.2.0.jar,../airflow/jars/mysql-connector-java-8.0.19.jar",
@@ -74,9 +74,5 @@ with DAG('mlflow_model', default_args=default_args, schedule_interval=None) as d
         bash_command="python3 $AIRFLOW_HOME/scripts/model_register.py"
         )
 
-    serving_model = BashOperator(
-        task_id="serving_model",
-        bash_command='mlflow models serve -m "models:/restaurant_recommender/Production"'
-    )
 
-    set_env >> feature_store >> train_model >> register_model >> serving_model
+    set_env >> feature_store >> train_model >> register_model
