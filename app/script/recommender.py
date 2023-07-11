@@ -22,7 +22,9 @@ def read_item(name,fullRes):
 def contend_based_recommendations(res,titles):
     """read matrix create similarity function and call main function"""
     tfidf_matrix = scipy.sparse.load_npz('data/res_matrix.npz')
+    print(tfidf_matrix.shape)
     cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
+    print(cosine_sim.shape)
     return get_recommendations(res, titles, cosine_sim)
 
 

@@ -1,3 +1,3 @@
 import streamlit as st
-MOVIE_NUMBER = 5
+RES_NUMBER = 5
 name=None
