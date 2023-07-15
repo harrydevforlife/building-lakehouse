@@ -91,7 +91,7 @@ def main():
     # deptDF = spark.createDataFrame(data=userid, schema = useridColumns)
 
     userid = st.session_state["userid"]
-    als_recommend = make_card_element(userid, recommended_res_num)
+    als_recommend = make_card_element(userid, const.RES_NUMBER,model,StructType,StructField,IntegerType,explode,col,spark)
 
     # als_recommend=show_recom_user(deptDF,model,fullRes,explode,col)
     show_recommended_res_info(als_recommend, col_for_user, show_score,streamlit)
