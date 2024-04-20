@@ -4,7 +4,7 @@ from logging import Logger
 from typing import Dict, List, Optional
 
 from airflow import DAG
-from airflow.models import Variable, BaseOperator
+from airflow.models import BaseOperator
 from airflow.operators.dummy_operator import DummyOperator
 
 logger = logging.getLogger(__name__)
@@ -87,7 +87,6 @@ class DbtTaskGenerator:
                 self._add_model_dependencies(dbt_model_tasks, parent_node)
 
     def _create_dbt_run_model_tasks(self, nodes_to_add: Dict[str, DbtNode]) -> Dict[str, BaseOperator]:
-        dbt_docker_image_details = Variable.get("docker_dbt-data-platform", deserialize_json=True)
         dbt_model_tasks: Dict[str, BaseOperator] = {
             node.full_name: self._create_dbt_run_task(node.name)
             for node in nodes_to_add.values()

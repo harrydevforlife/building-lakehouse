@@ -2,11 +2,11 @@ version: "3.9"
 
 services:
 
-  de_mysql:
+  mysql:
     image: mariadb:10.11.2
-    container_name: de_mysql
-    # volumes:
-    #   - ./mysql:/var/lib/mysql
+    container_name: mysql
+    volumes:
+      - ./docker-volumes/mysql:/var/lib/mysql
     ports:
       - "3306:3306"
     env_file:
@@ -14,11 +14,11 @@ services:
     networks:
       - data_network
 
-  de_psql:
+  postgresql:
     image: postgres:15
-    container_name: de_psql
-    # volumes:
-    #   - ./psql:/var/lib/postgresql/data
+    container_name: postgresql
+    volumes:
+      - ./docker-volumes/psql:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     env_file:
@@ -35,7 +35,7 @@ services:
       - "9000:9000"
     command: [ "server", "/data", "--console-address", ":9001" ]
     volumes:
-      - ./minio/data:/data
+      - ./docker-volumes/minio/data:/data
     env_file:
       - .env
     networks:
@@ -49,14 +49,13 @@ services:
     ports:
       - "9083:9083"
     volumes:
-      # - ./hive-metastore/entrypoint.sh:/entrypoint.sh
       - ./hive-metastore/metastore-site.xml:/opt/apache-hive-metastore-3.0.0-bin/conf/metastore-site.xml:ro
     environment:
-      METASTORE_DB_HOSTNAME: de_mysql
+      METASTORE_DB_HOSTNAME: mysql
     networks:
       - data_network
     depends_on:
-      - de_mysql
+      - mysql
       - minio
 
   spark-master:
@@ -65,8 +64,8 @@ services:
       dockerfile: ./Dockerfile
     container_name: "spark-master"
     ports:
-      - "7077:7077"  # Spark master port
-      - "8081:8080"  # Spark master web UI port
+      - "7077:7077"
+      - "8081:8080"
     environment:
       - SPARK_MODE=master
       - SPARK_RPC_AUTHENTICATION_ENABLED=no
@@ -137,13 +136,8 @@ services:
       - mysql-airflow
     environment:
       - LOAD_EX=n
-      - AIRFLOW__CORE__FERNET_KEY=airflow_fernet_key
-      - AIRFLOW__WEBSERVER__SECRET_KEY=airflow_secret_key
-      - AIRFLOW__WEBSERVER__SECRET_KEY_CMD=airflow_secret_key
-      - AIRFLOW__WEBSERVER__SECRET_KEY_SECRET=airflow_secret_key
       - AIRFLOW__WEBSERVER__RBAC=False
       - AIRFLOW__WEBSERVER__SESSION_BACKEND=securecookie
-      - AIRFLOW_CORE_MYSQL_CONN=mysql+mysqlconnector://airflow:airflow@mysql-airflow:3307/airflow
       - EXECUTOR=Local    
     volumes:
         - ./restaurant_analytis:/usr/local/airflow/restaurant_analytis
@@ -171,11 +165,11 @@ services:
     ports:
       - "3307:3307"
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=airflow
-      - MYSQL_USER=airflow
-      - MYSQL_PASSWORD=airflow
-      - MYSQL_TCP_PORT=3307
+      - MYSQL_ROOT_PASSWORD=$AIRFLOW_MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE=$AIRFLOW_MYSQL_DATABASE
+      - MYSQL_USER=$AIRFLOW_MYSQL_USER
+      - MYSQL_PASSWORD=$AIRFLOW_MYSQL_PASSWORD
+      - MYSQL_TCP_PORT=$AIRFLOW_MYSQL_TCP_PORT
     expose:
       - "3307"
     command: --default-authentication-plugin=mysql_native_password
@@ -191,14 +185,13 @@ services:
     container_name: mlflow
     ports:
       - "5000:5000"
+    env_file:
+      - .env
     environment:
       - PORT=5000
       - FILE_DIR=/mlflow
       - AWS_BUCKET=mlflow
-      - AWS_ACCESS_KEY_ID=minio
-      - AWS_SECRET_ACCESS_KEY=minio123
       - PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
-      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
     networks:
       - data_network
 
@@ -209,14 +202,13 @@ services:
     container_name: recommender_model
     ports:
       - "5001:5001"
+    env_file:
+      - .env
     volumes:
       - ./model_server/main.py:/opt/mlflow/main.py
     environment:
-      - AWS_ACCESS_KEY_ID=minio
-      - AWS_SECRET_ACCESS_KEY=minio123
       - AWS_BUCKET=mlflow
       - FILE_DIR=/mlflow
-      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
     networks:
       - data_network
 

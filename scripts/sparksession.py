@@ -1,8 +1,8 @@
+import os
 
-
-AWS_ACCESS_KEY = 'minioaws'
-AWS_SECRET_KEY = 'minioaws'
-AWS_S3_ENDPOINT = 'http://minio:9000'
+AWS_ACCESS_KEY = os.environ['AWS_ACCESS_KEY']
+AWS_SECRET_KEY = os.environ['AWS_SECRET_KEY']
+AWS_S3_ENDPOINT = os.environ['AWS_S3_ENDPOINT']
 AWS_BUCKET_NAME = 'lakehouse'
 
 
@@ -28,6 +28,6 @@ def spark_session(spark_session):
         .enableHiveSupport()\
         .getOrCreate()
 
-    spark.sparkContext.setLogLevel("ERROR")
+    spark.sparkContext.setLogLevel("INFO")
 
     return spark

@@ -36,9 +36,9 @@ models:
     # Config indicated by + and applies to all files under models/example/
     +file_format: delta
     +pre_hook:
-      - SET spark.hadoop.fs.s3a.endpoint=http://minio:9000
-      - SET spark.hadoop.fs.s3a.access.key=minio
-      - SET spark.hadoop.fs.s3a.secret.key=minio123
+      - SET spark.hadoop.fs.s3a.endpoint="{{ env_var('AWS_S3_ENDPOINT') }}"
+      - SET spark.hadoop.fs.s3a.access.key="{{ env_var('AWS_ACCESS_KEY') }}"
+      - SET spark.hadoop.fs.s3a.secret.key="{{ env_var('AWS_SECRET_KEY') }}"
       - SET spark.hadoop.fs.s3a.path.style.access=true
       - SET spark.hadoop.fs.s3a.connection.ssl.enabled=false
       - SET spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem

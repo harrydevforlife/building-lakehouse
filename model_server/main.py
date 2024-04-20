@@ -1,23 +1,14 @@
-import json, os
-import numpy as np
+import json
 import mlflow
-from flask import Flask, request, redirect, url_for, flash, jsonify
+from flask import Flask, request
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import explode, col
-from pyspark.sql.types import StructType, StructField, IntegerType, StringType
 
 
 app = Flask(__name__)
 
-
 spark = SparkSession.builder.appName('Recommendation system').getOrCreate()
 
-
-os.environ["AWS_ACCESS_KEY_ID"] = "minio"
-os.environ["AWS_SECRET_ACCESS_KEY"] = "minio123"
-os.environ["AWS_BUCKET"] = "mlflow"
-os.environ["FILE_DIR"] = "/mlflow"
-os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://minio:9000"
 
 mlflow.set_tracking_uri("http://mlflow:5000")
 mlflow.set_experiment("recommend_model")
