@@ -26,7 +26,7 @@
 
 <a name="description"></a>
 ## Description
-**Warning**: This project is still a work in progress. It is not yet ready for production use. Please use it at your own risk.  
+**Warning**: This project is just a poc for open-sourced lakehouse platform.
 
 This project is a data lakehouse platform with specialized tools for data analytics. The platform is built on top of the following components:
 - [Apache Spark](https://spark.apache.org/): Apache Spark is a unified analytics engine for big data processing, with built-in modules for streaming, SQL, machine learning and graph processing.
